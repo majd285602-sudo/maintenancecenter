@@ -1,52 +1,91 @@
 using System;
 using System.Collections.Generic;
-public interface IRepairable{void StartRepair();void CompleteRepair();double CalculateRepairCost();}
-public static class ValidationHelper{public static bool IsValidSerial(string s){return !string.IsNullOrWhiteSpace(s)&&s.Length>=5;}}
-public delegate void StatusHandler(object sender,string s);
-public abstract class Device:IRepairable{
-private string _serial,_brand,_model,_status;private double _cost;
-public static int TotalDevices{get;private set;}public static double TotalValue{get;private set;}
-public string Serial{get{return _serial;}}
-public string Brand{get{return _brand;}set{if(string.IsNullOrWhiteSpace(value))throw new ArgumentException("empty");_brand=value;}}
-public string Model{get{return _model;}set{if(string.IsNullOrWhiteSpace(value))throw new ArgumentException("empty");_model=value;}}
-public string Status{get{return _status;}protected set{_status=value;if(StatusChanged!=null)StatusChanged(this,value);}}
-public double BaseCost{get{return _cost;}set{if(value<0)throw new ArgumentException("neg");_cost=value;}}
-public event StatusHandler StatusChanged;
-protected Device(string s,string b,string m,double c){if(!ValidationHelper.IsValidSerial(s))throw new ArgumentException("serial");_serial=s;Brand=b;Model=m;BaseCost=c;Status="Pending";TotalDevices++;}
-public abstract double CalculateRepairCost();
-public double WithDiscount(double p){double c=CalculateRepairCost();return c-(c*p/100);}
-public void StartRepair(){Status="In Repair";}public void CompleteRepair(){Status="Repaired";TotalValue+=CalculateRepairCost();}
-public virtual void Show(){Console.WriteLine(GetType().Name+" "+Brand+" "+Model+" | "+Serial+" | "+Status+" | "+CalculateRepairCost());}
+
+// الفئة الأساسية
+public class Device
+{
+    public string Brand = "";
+    public string Model = "";
+    public int Year;
+    public virtual void DisplayInfo()
+    {
+        Console.WriteLine($"Brand: {Brand} | Model: {Model} | Year: {Year}");
+    }
 }
-public class Refrigerator:Device{public int Cap{get;set;}public bool Freezer{get;set;}
-public Refrigerator(string s,string b,string m,double c,int cap,bool f):base(s,b,m,c){Cap=cap;Freezer=f;}
-public override double CalculateRepairCost(){double x=BaseCost;if(Cap>400)x+=50;if(Freezer)x+=30;return x;}
-public void Defrost(){Console.WriteLine("Defrost "+Brand);}}
-public class WashingMachine:Device{public int Kg{get;set;}public bool Auto{get;set;}
-public WashingMachine(string s,string b,string m,double c,int kg,bool a):base(s,b,m,c){Kg=kg;Auto=a;}
-public override double CalculateRepairCost(){double x=BaseCost;if(Kg>=8)x+=40;if(Auto)x+=25;return x;}
-public void Spin(){Console.WriteLine("Spin "+Brand);}}
-public class AirConditioner:Device{public int BTU{get;set;}public string Gas{get;set;}
-public AirConditioner(string s,string b,string m,double c,int btu,string g):base(s,b,m,c){BTU=btu;Gas=g;}
-public override double CalculateRepairCost(){double x=BaseCost;if(BTU>=24000)x+=60;if(Gas=="R410")x+=20;return x;}
-public void Clean(){Console.WriteLine("Clean "+Brand);}}
-public class MaintenanceCenter{private List<Device> list=new List<Device>();
-public void Add(Device d){d.StatusChanged+=delegate(object sender,string s){Device v=(Device)sender;Console.WriteLine("[Alert] "+v.Brand+" -> "+s);};list.Add(d);}
-public void ShowAll(){Console.WriteLine("--- All ---");foreach(Device d in list)d.Show();}
-public double Total(){double t=0;foreach(Device d in list)t+=d.CalculateRepairCost();return t;}}
-public class Program{public static void Main(){
-Console.WriteLine("=== Maintenance Center ===");
-MaintenanceCenter c=new MaintenanceCenter();
-Device f=new Refrigerator("SN-12345","LG","GR-500",100,450,true);
-Device w=new WashingMachine("SN-67890","Samsung","WF-800",80,9,true);
-Device a=new AirConditioner("SN-11111","Midea","MS-12000",120,24000,"R410");
-c.Add(f);c.Add(w);c.Add(a);c.ShowAll();
-f.StartRepair();f.CompleteRepair();((Refrigerator)f).Defrost();
-w.StartRepair();w.CompleteRepair();((WashingMachine)w).Spin();
-a.StartRepair();a.CompleteRepair();((AirConditioner)a).Clean();
-c.ShowAll();
-Console.WriteLine("Total Devices: "+Device.TotalDevices);
-Console.WriteLine("Total Value: "+Device.TotalValue);
-Console.WriteLine("Total Cost: "+c.Total());
-Console.WriteLine("Fridge Discount 10%: "+f.WithDiscount(10));
-}}
+
+public class Refrigerator : Device
+{
+    public int Capacity;
+    public override void DisplayInfo()
+    {
+        Console.WriteLine($"[براد] Brand: {Brand} | Model: {Model} | Year: {Year} | Capacity: {Capacity}L");
+    }
+}
+
+public class WashingMachine : Device
+{
+    public int LoadCapacity;
+    public override void DisplayInfo()
+    {
+        Console.WriteLine($"[غسالة] Brand: {Brand} | Model: {Model} | Year: {Year} | Load: {LoadCapacity}kg");
+    }
+}
+
+public class AirConditioner : Device
+{
+    public int Power;
+    public override void DisplayInfo()
+    {
+        Console.WriteLine($"[مكيف] Brand: {Brand} | Model: {Model} | Year: {Year} | Power: {Power} BTU");
+    }
+}
+
+public class MaintenanceCenter
+{
+    public List<Device> Devices = new List<Device>();
+    public void AddDevice(Device d) { Devices.Add(d); }
+    public void ShowAll()
+    {
+        Console.WriteLine("\n--- All Devices ---");
+        if (Devices.Count == 0) Console.WriteLine("No devices yet");
+        foreach (var d in Devices) d.DisplayInfo();
+    }
+}
+
+class Program
+{
+    static void Main()
+    {
+        MaintenanceCenter center = new MaintenanceCenter();
+
+        center.AddDevice(new Refrigerator { Brand = "LG", Model = "GR-500", Year = 2022, Capacity = 450 });
+        center.AddDevice(new WashingMachine { Brand = "Samsung", Model = "WF-800", Year = 2023, LoadCapacity = 8 });
+        center.AddDevice(new AirConditioner { Brand = "Midea", Model = "MS-12000", Year = 2024, Power = 12000 });
+
+        while (true)
+        {
+            Console.WriteLine("\n=== Maintenance Center ===");
+            Console.WriteLine("1. Add Refrigerator");
+            Console.WriteLine("2. Show All Devices");
+            Console.WriteLine("3. Exit");
+            Console.Write("Choose: ");
+            string choice = Console.ReadLine() ?? "";
+
+            if (choice == "1")
+            {
+                Console.Write("Brand: "); string b = Console.ReadLine() ?? "";
+                Console.Write("Model: "); string m = Console.ReadLine() ?? "";
+                center.AddDevice(new Refrigerator { Brand = b, Model = m, Year = 2024, Capacity = 300 });
+                Console.WriteLine("Added Successfully!");
+            }
+            else if (choice == "2")
+            {
+                center.ShowAll();
+            }
+            else if (choice == "3")
+            {
+                break;
+            }
+        }
+    }
+}
