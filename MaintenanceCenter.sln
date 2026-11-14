@@ -1,12 +1,24 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
-VisualStudioVersion = 17.0.31903.59
+VisualStudioVersion = 17.14.36511.14 d17.14
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MaintenanceCenter", "MaintenanceCenter.csproj", "{A1B2C3D4-E5F6-4A5B-8C9D-123456789ABC}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HomeCareManagement", "HomeCareManagement\HomeCareManagement.csproj", "{A5CA879E-40B5-4877-85A1-0A4A83573B9B}"
 EndProject
 Global
  GlobalSection(SolutionConfigurationPlatforms) = preSolution
   Debug|Any CPU = Debug|Any CPU
   Release|Any CPU = Release|Any CPU
+ EndGlobalSection
+ GlobalSection(ProjectConfigurationPlatforms) = postSolution
+  {A5CA879E-40B5-4877-85A1-0A4A83573B9B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+  {A5CA879E-40B5-4877-85A1-0A4A83573B9B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+  {A5CA879E-40B5-4877-85A1-0A4A83573B9B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+  {A5CA879E-40B5-4877-85A1-0A4A83573B9B}.Release|Any CPU.Build.0 = Release|Any CPU
+ EndGlobalSection
+ GlobalSection(SolutionProperties) = preSolution
+  HideSolutionNode = FALSE
+ EndGlobalSection
+ GlobalSection(ExtensibilityGlobals) = postSolution
+  SolutionGuid = {79894B18-13D8-4B41-81CE-CD055B7D5F3F}
  EndGlobalSection
 EndGlobal
